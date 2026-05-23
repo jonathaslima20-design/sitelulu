@@ -13,14 +13,19 @@ export default function ConsultationForm({ defaultPlan = 'Individual', onClose }
     e.preventDefault();
     setStatus('loading');
     setError('');
-    const { error } = await supabase.from('consultation_requests').insert({
+    if (!supabase) {
+      setStatus('error');
+      setError('Serviço indisponível no momento. Tente novamente.');
+      return;
+    }
+    const { error: insertError } = await supabase.from('consultation_requests').insert({
       name: form.name,
       email: form.email,
       company: form.company,
       plan: form.plan,
       message: form.message,
     });
-    if (error) {
+    if (insertError) {
       setStatus('error');
       setError('Não foi possível enviar. Tente novamente.');
       return;
