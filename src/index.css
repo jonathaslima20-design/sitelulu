@@ -11,11 +11,11 @@
   body {
     font-family: 'Inter Tight', system-ui, sans-serif;
     background: #FFFFFF;
-    color: #0A0A0A;
+    color: #1a2b4a;
     font-feature-settings: 'ss01', 'cv11';
   }
   ::selection {
-    background: #0A0A0A;
+    background: #1a2b4a;
     color: #FFFFFF;
   }
 }
@@ -35,14 +35,14 @@
       0 20px 40px -20px rgba(0,0,0,0.08);
   }
   .cta-black {
-    background: #0A0A0A;
+    background: #1a2b4a;
     color: #FFFFFF;
-    border: 1px solid #0A0A0A;
+    border: 1px solid #1a2b4a;
     transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 200ms ease;
-    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+    box-shadow: 0 8px 24px -8px rgba(26,43,74,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
   }
   .cta-black:hover {
-    box-shadow: 0 14px 36px -10px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12);
+    box-shadow: 0 14px 36px -10px rgba(26,43,74,0.55), inset 0 1px 0 rgba(255,255,255,0.12);
   }
   .label-mono {
     font-family: 'Geist Mono', ui-monospace, monospace;
@@ -52,7 +52,7 @@
     color: #52525B;
   }
   .chrome-text {
-    background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 45%, #2a2a2a 55%, #0a0a0a 100%);
+    background: linear-gradient(180deg, #233d68 0%, #1a2b4a 45%, #2a3f63 55%, #1a2b4a 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
