@@ -8,10 +8,10 @@ import Reveal, { StaggerGroup, StaggerItem } from './components/Reveal';
 import ParallaxImage from './components/ParallaxImage';
 import ConsultationForm from './components/ConsultationForm';
 
-import IMG_HERO from './assets/IMG_4793.jpg';
-import IMG_BOOK from './assets/IMG_4701_(1).jpg';
-import IMG_FOUNDER from './assets/IMG_4884.jpg';
-import IMG_PHONE from './assets/IMG_4813.jpg';
+const IMG_HERO = 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1200';
+const IMG_BOOK = 'https://images.pexels.com/photos/5668473/pexels-photo-5668473.jpeg?auto=compress&cs=tinysrgb&w=800';
+const IMG_FOUNDER = 'https://images.pexels.com/photos/3756679/pexels-photo-3756679.jpeg?auto=compress&cs=tinysrgb&w=800';
+const IMG_PHONE = 'https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=800';
 
 function App() {
   const [modalOpen, setModalOpen] = useState(false);
