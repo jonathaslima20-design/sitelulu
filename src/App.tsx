@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, ArrowUpRight, Compass, Crosshair, Sparkles, Globe as Globe2, Check, Star, X, Quote } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Compass, Crosshair, Sparkles, Globe as Globe2, Check, Star, X, Quote, TrendingUp } from 'lucide-react';
 
 import CursorGlow from './components/CursorGlow';
 import MagneticButton from './components/MagneticButton';
@@ -75,7 +75,7 @@ function Header({ scrolled, onCta }: { scrolled: boolean; onCta: () => void }) {
       <div className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
         <a href="#top" className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-md bg-ink flex items-center justify-center">
-            <span className="text-white font-mono text-[10px] tracking-widest">B</span>
+            <TrendingUp className="w-4 h-4 text-white" />
           </div>
           <span className="font-medium tracking-tightest text-ink">
             Luana Azevedo<span className="text-silver-400 font-light">.</span>
