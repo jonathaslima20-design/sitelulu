@@ -78,7 +78,7 @@ function Header({ scrolled, onCta }: { scrolled: boolean; onCta: () => void }) {
             <span className="text-white font-mono text-[10px] tracking-widest">B</span>
           </div>
           <span className="font-medium tracking-tightest text-ink">
-            Baratinhas<span className="text-silver-400 font-light">.</span>
+            Luana Azevedo<span className="text-silver-400 font-light">.</span>
             <span className="label-mono ml-2 align-middle">Marketing</span>
           </span>
         </a>
