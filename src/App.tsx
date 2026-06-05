@@ -7,16 +7,20 @@ import MagneticButton from './components/MagneticButton';
 import Reveal, { StaggerGroup, StaggerItem } from './components/Reveal';
 import ParallaxImage from './components/ParallaxImage';
 import ConsultationForm from './components/ConsultationForm';
+import { useSiteContent, SiteContent, Plan, Testimonial, Brand, Metric, Pillar } from './hooks/useSiteContent';
 
 const IMG_HERO = '/photo_2026-06-05_17-56-07.jpg';
 const IMG_BOOK = 'https://images.pexels.com/photos/5668473/pexels-photo-5668473.jpeg?auto=compress&cs=tinysrgb&w=800';
 const IMG_FOUNDER = 'https://images.pexels.com/photos/3756679/pexels-photo-3756679.jpeg?auto=compress&cs=tinysrgb&w=800';
 const IMG_PHONE = 'https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=800';
 
+const iconMap: Record<string, typeof Compass> = { Compass, Crosshair, Sparkles, Globe2 };
+
 function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPlan, setModalPlan] = useState('Individual');
   const [scrolled, setScrolled] = useState(false);
+  const { content, plans, testimonials, brands, metrics, pillars, theme, loading } = useSiteContent();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -29,25 +33,36 @@ function App() {
     setModalOpen(true);
   };
 
+  const showCursorGlow = theme?.effects?.cursorGlow !== false;
+  const showGrain = theme?.effects?.grain !== false;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-pulse text-silver-500 label-mono">Carregando...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen bg-white text-ink overflow-x-hidden">
-      <CursorGlow />
+      {showCursorGlow && <CursorGlow />}
 
-      <Header scrolled={scrolled} onCta={() => openModal('Individual')} />
+      <Header scrolled={scrolled} onCta={() => openModal('Individual')} content={content} />
 
       <main className="relative z-10">
-        <Hero onCta={() => openModal('Individual')} />
-        <Marquee />
-        <SocialProof />
-        <Methodology />
-        <FounderSection />
-        <Metrics />
-        <Plans onSelect={openModal} />
-        <Testimonials />
-        <FinalCTA onCta={() => openModal('Corporate')} />
+        <Hero onCta={() => openModal('Individual')} content={content} showGrain={showGrain} />
+        <MarqueeSection content={content} />
+        <SocialProof content={content} brands={brands} />
+        <MethodologySection content={content} pillars={pillars} showGrain={showGrain} />
+        <FounderSection content={content} />
+        <MetricsSection content={content} metrics={metrics} />
+        <PlansSection onSelect={openModal} content={content} plans={plans} />
+        <TestimonialsSection content={content} testimonials={testimonials} />
+        <FinalCTA onCta={() => openModal('Corporate')} content={content} />
       </main>
 
-      <Footer />
+      <FooterSection content={content} />
 
       <AnimatePresence>
         {modalOpen && (
@@ -60,9 +75,7 @@ function App() {
   );
 }
 
-/* ---------------------------- HEADER ---------------------------- */
-
-function Header({ scrolled, onCta }: { scrolled: boolean; onCta: () => void }) {
+function Header({ scrolled, onCta, content }: { scrolled: boolean; onCta: () => void; content: SiteContent }) {
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -78,8 +91,8 @@ function Header({ scrolled, onCta }: { scrolled: boolean; onCta: () => void }) {
             <TrendingUp className="w-4 h-4 text-white" />
           </div>
           <span className="font-medium tracking-tightest text-ink">
-            Luana Azevedo<span className="text-silver-400 font-light">.</span>
-            <span className="label-mono ml-2 align-middle">Marketing</span>
+            {content.header_brand_name}<span className="text-silver-400 font-light">.</span>
+            <span className="label-mono ml-2 align-middle">{content.header_brand_suffix}</span>
           </span>
         </a>
         <nav className="hidden md:flex items-center gap-9 text-sm text-silver-600">
@@ -92,7 +105,7 @@ function Header({ scrolled, onCta }: { scrolled: boolean; onCta: () => void }) {
           onClick={onCta}
           className="cta-black rounded-full px-5 py-2.5 text-sm font-medium tracking-tight inline-flex items-center gap-2"
         >
-          Agendar Consultoria
+          {content.header_cta}
           <ArrowRight className="w-3.5 h-3.5" />
         </MagneticButton>
       </div>
@@ -100,46 +113,43 @@ function Header({ scrolled, onCta }: { scrolled: boolean; onCta: () => void }) {
   );
 }
 
-/* ---------------------------- HERO ---------------------------- */
-
-function Hero({ onCta }: { onCta: () => void }) {
+function Hero({ onCta, content, showGrain }: { onCta: () => void; content: SiteContent; showGrain: boolean }) {
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 600], [0, 80]);
   const heroScale = useTransform(scrollY, [0, 600], [1, 1.06]);
 
   return (
-    <section id="top" className="relative pt-36 pb-24 lg:pt-44 lg:pb-32 grain">
+    <section id="top" className={`relative pt-36 pb-24 lg:pt-44 lg:pb-32 ${showGrain ? 'grain' : ''}`}>
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div className="lg:col-span-7">
           <Reveal>
             <div className="inline-flex items-center gap-2 border border-hairline rounded-full px-3.5 py-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-ink animate-pulse" />
-              <span className="label-mono">BRANDING | COMUNICAÇÃO &amp; MARKETING</span>
+              <span className="label-mono">{content.hero_badge}</span>
             </div>
           </Reveal>
 
           <StaggerGroup className="mt-7" delay={0.07}>
             <StaggerItem>
               <h1 className="font-medium tracking-tightest leading-[0.95] text-[clamp(2.6rem,6.4vw,5.6rem)]">
-                Transforme sua marca
+                {content.hero_title_1}
               </h1>
             </StaggerItem>
             <StaggerItem>
               <h1 className="font-medium tracking-tightest leading-[0.95] text-[clamp(2.6rem,6.4vw,5.6rem)] chrome-text">
-                em uma autoridade
+                {content.hero_title_2}
               </h1>
             </StaggerItem>
             <StaggerItem>
               <h1 className="font-medium tracking-tightest leading-[0.95] text-[clamp(2.6rem,6.4vw,5.6rem)] italic font-light text-silver-700">
-                inquestionável.
+                {content.hero_title_3}
               </h1>
             </StaggerItem>
           </StaggerGroup>
 
           <Reveal delay={0.4}>
             <p className="mt-8 max-w-xl text-lg leading-[1.55] text-silver-600">
-              Consultoria estratégica que arquiteta posicionamento, narrativa e presença digital
-              para marcas que recusam o lugar comum. Aceleramos a transição de fornecedor para referência.
+              {content.hero_paragraph}
             </p>
           </Reveal>
 
@@ -149,11 +159,11 @@ function Hero({ onCta }: { onCta: () => void }) {
                 onClick={onCta}
                 className="cta-black rounded-full px-7 py-4 text-[15px] font-medium tracking-tight inline-flex items-center gap-2.5"
               >
-                Agendar Consultoria Estratégica
+                {content.hero_cta_primary}
                 <ArrowRight className="w-4 h-4" />
               </MagneticButton>
               <a href="#metodologia" className="group inline-flex items-center gap-2 text-sm text-ink">
-                <span className="border-b border-ink pb-0.5">Ver metodologia</span>
+                <span className="border-b border-ink pb-0.5">{content.hero_cta_secondary}</span>
                 <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" />
               </a>
             </div>
@@ -171,9 +181,9 @@ function Hero({ onCta }: { onCta: () => void }) {
               <div className="text-sm">
                 <div className="flex items-center gap-1 text-ink">
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-ink" />)}
-                  <span className="ml-2 font-medium">4.9 / 5.0</span>
+                  <span className="ml-2 font-medium">{content.hero_social_rating}</span>
                 </div>
-                <p className="text-silver-500 text-xs mt-0.5">Confiança de 200+ marcas em ascensão</p>
+                <p className="text-silver-500 text-xs mt-0.5">{content.hero_social_text}</p>
               </div>
             </div>
           </Reveal>
@@ -193,10 +203,9 @@ function Hero({ onCta }: { onCta: () => void }) {
               className="absolute -bottom-6 -left-6 glass-light rounded-2xl p-5 max-w-[260px]"
             >
               <div className="label-mono">FUNDADORA</div>
-              <div className="mt-1 text-base font-medium tracking-tight text-ink">Luana Lima</div>
-              <div className="text-xs text-silver-500 mt-0.5">CEO · Estrategista de Marca</div>
+              <div className="mt-1 text-base font-medium tracking-tight text-ink">{content.hero_founder_name}</div>
+              <div className="text-xs text-silver-500 mt-0.5">{content.hero_founder_role}</div>
             </motion.div>
-
           </motion.div>
         </div>
       </div>
@@ -204,10 +213,8 @@ function Hero({ onCta }: { onCta: () => void }) {
   );
 }
 
-/* ---------------------------- MARQUEE ---------------------------- */
-
-function Marquee() {
-  const items = ['POSICIONAMENTO', 'NARRATIVA', 'AUTORIDADE', 'PRESENÇA', 'DIFERENCIAÇÃO', 'EXPANSÃO'];
+function MarqueeSection({ content }: { content: SiteContent }) {
+  const items = (content.marquee_items || '').split(',').filter(Boolean);
   const row = [...items, ...items, ...items];
   return (
     <div className="border-y border-hairline bg-bone overflow-hidden">
@@ -227,27 +234,22 @@ function Marquee() {
   );
 }
 
-/* ---------------------------- SOCIAL PROOF ---------------------------- */
-
-function SocialProof() {
-  const brands = ['LUMEN', 'NORDH', 'ATELIER', 'KAIROS', 'MERIDIAN', 'OBSCURA', 'VANTAGE', 'ARGENT'];
+function SocialProof({ content, brands }: { content: SiteContent; brands: Brand[] }) {
   return (
     <section className="py-20 lg:py-28">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal>
           <div className="text-center">
-            <div className="label-mono">CLIENTES SELECIONADOS</div>
-            <h2 className="mt-4 text-2xl md:text-3xl tracking-tightest text-silver-700 font-light max-w-2xl mx-auto">
-              Marcas que escolheram <span className="text-ink font-medium">deixar de competir por preço</span> e começaram a competir por autoridade.
-            </h2>
+            <div className="label-mono">{content.social_proof_label}</div>
+            <h2 className="mt-4 text-2xl md:text-3xl tracking-tightest text-silver-700 font-light max-w-2xl mx-auto" dangerouslySetInnerHTML={{ __html: content.social_proof_title }} />
           </div>
         </Reveal>
 
         <StaggerGroup className="mt-16 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-y-10 gap-x-6">
           {brands.map((b) => (
-            <StaggerItem key={b}>
+            <StaggerItem key={b.id}>
               <div className="flex items-center justify-center text-silver-400 font-mono text-sm tracking-[0.25em] opacity-50 hover:opacity-100 hover:text-ink transition-all duration-500 cursor-default">
-                {b}
+                {b.name}
               </div>
             </StaggerItem>
           ))}
@@ -257,89 +259,55 @@ function SocialProof() {
   );
 }
 
-/* ---------------------------- METHODOLOGY (BENTO) ---------------------------- */
-
-function Methodology() {
-  const pillars = [
-    {
-      icon: Compass,
-      title: 'Diagnóstico de Marca',
-      copy: 'Auditoria 360° de percepção, narrativa e arquitetura. Mapeamos o que sua marca diz versus o que o mercado entende.',
-      tag: '01',
-      span: 'lg:col-span-2 lg:row-span-2',
-    },
-    {
-      icon: Crosshair,
-      title: 'Diferenciação de Mercado',
-      copy: 'Engenharia de posicionamento. Crafting de uma promessa única, defensável e ressonante.',
-      tag: '02',
-      span: '',
-    },
-    {
-      icon: Sparkles,
-      title: 'Presença Digital Elite',
-      copy: 'Identidade verbal e visual em todos os pontos de contato. Cada touchpoint comunica nível.',
-      tag: '03',
-      span: '',
-    },
-    {
-      icon: Globe2,
-      title: 'Expansão de Autoridade',
-      copy: 'Campanhas, mídia e conteúdo orquestrados para transformar reconhecimento em demanda qualificada e recorrente.',
-      tag: '04',
-      span: 'lg:col-span-2',
-    },
-  ];
-
+function MethodologySection({ content, pillars, showGrain }: { content: SiteContent; pillars: Pillar[]; showGrain: boolean }) {
   return (
-    <section id="metodologia" className="py-24 lg:py-32 bg-bone border-y border-hairline relative grain">
+    <section id="metodologia" className={`py-24 lg:py-32 bg-bone border-y border-hairline relative ${showGrain ? 'grain' : ''}`}>
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end mb-14">
           <Reveal className="lg:col-span-7">
-            <div className="label-mono">METODOLOGIA · 04 PILARES</div>
-            <h2 className="mt-4 font-medium tracking-tightest leading-[1.02] text-[clamp(2rem,4.4vw,3.6rem)]">
-              Um sistema operacional<br />para marcas que pretendem liderar.
-            </h2>
+            <div className="label-mono">{content.methodology_label}</div>
+            <h2 className="mt-4 font-medium tracking-tightest leading-[1.02] text-[clamp(2rem,4.4vw,3.6rem)]" dangerouslySetInnerHTML={{ __html: content.methodology_title }} />
           </Reveal>
           <Reveal delay={0.15} className="lg:col-span-5">
-            <p className="text-silver-600 leading-relaxed">
-              Não vendemos campanhas avulsas. Construímos a infraestrutura estratégica que faz a sua marca
-              ser percebida como a única escolha óbvia no seu segmento.
-            </p>
+            <p className="text-silver-600 leading-relaxed">{content.methodology_paragraph}</p>
           </Reveal>
         </div>
 
         <StaggerGroup className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:auto-rows-[260px]">
-          {pillars.map(({ icon: Icon, title, copy, tag, span }) => (
-            <StaggerItem key={tag} className={span}>
-              <motion.div
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="group glass-light rounded-2xl p-7 h-full flex flex-col justify-between relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-radial from-silver-200/40 to-transparent rounded-full blur-3xl pointer-events-none" />
-                <div className="flex items-start justify-between relative">
-                  <div className="w-11 h-11 rounded-xl bg-ink text-white flex items-center justify-center">
-                    <Icon className="w-5 h-5" strokeWidth={1.5} />
+          {pillars.map(({ icon, title, description, tag, span }) => {
+            const Icon = iconMap[icon] || Compass;
+            return (
+              <StaggerItem key={tag} className={span}>
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="group glass-light rounded-2xl p-7 h-full flex flex-col justify-between relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-radial from-silver-200/40 to-transparent rounded-full blur-3xl pointer-events-none" />
+                  <div className="flex items-start justify-between relative">
+                    <div className="w-11 h-11 rounded-xl bg-ink text-white flex items-center justify-center">
+                      <Icon className="w-5 h-5" strokeWidth={1.5} />
+                    </div>
+                    <span className="label-mono">{tag}</span>
                   </div>
-                  <span className="label-mono">{tag}</span>
-                </div>
-                <div className="relative">
-                  <h3 className="text-xl md:text-2xl tracking-tightest font-medium text-ink">{title}</h3>
-                  <p className="mt-3 text-silver-600 leading-relaxed text-[15px]">{copy}</p>
-                </div>
-              </motion.div>
-            </StaggerItem>
-          ))}
+                  <div className="relative">
+                    <h3 className="text-xl md:text-2xl tracking-tightest font-medium text-ink">{title}</h3>
+                    <p className="mt-3 text-silver-600 leading-relaxed text-[15px]">{description}</p>
+                  </div>
+                </motion.div>
+              </StaggerItem>
+            );
+          })}
         </StaggerGroup>
       </div>
     </section>
   );
 }
 
-/* ---------------------------- FOUNDER ---------------------------- */
+function FounderSection({ content }: { content: SiteContent }) {
+  let stats: { number: string; label: string }[] = [];
+  try { stats = JSON.parse(content.founder_stats || '[]'); } catch { /* empty */ }
 
-function FounderSection() {
   return (
     <section id="fundadora" className="py-24 lg:py-36 relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -352,39 +320,23 @@ function FounderSection() {
 
         <div className="lg:col-span-7 lg:pl-8">
           <Reveal>
-            <div className="label-mono">FUNDADORA · CEO</div>
+            <div className="label-mono">{content.founder_label}</div>
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="mt-4 font-medium tracking-tightest leading-[1.02] text-[clamp(2rem,4.6vw,3.8rem)]">
-              Luana Lima.
+              {content.founder_name}
               <br />
-              <span className="text-silver-500 italic font-light">Arquiteta de marcas que dominam.</span>
+              <span className="text-silver-500 italic font-light">{content.founder_subtitle}</span>
             </h2>
           </Reveal>
 
           <StaggerGroup className="mt-8 space-y-5 text-[17px] leading-[1.65] text-silver-700 max-w-2xl">
-            <StaggerItem>
-              <p>
-                Há mais de uma década, Luana lidera estratégias de posicionamento que transformam empresas
-                medianas em referências de mercado. Sua abordagem combina análise comportamental,
-                arquitetura de narrativa e execução de presença digital com um padrão de exigência raro.
-              </p>
-            </StaggerItem>
-            <StaggerItem>
-              <p>
-                À frente da Baratinhas Marketing, criou uma metodologia proprietária que já conduziu mais
-                de 200 marcas — de pequenos negócios autorais a operações corporativas — para um patamar
-                onde concorrer por preço deixa de ser necessário.
-              </p>
-            </StaggerItem>
+            <StaggerItem><p>{content.founder_bio_1}</p></StaggerItem>
+            <StaggerItem><p>{content.founder_bio_2}</p></StaggerItem>
           </StaggerGroup>
 
           <StaggerGroup className="mt-10 grid grid-cols-2 md:grid-cols-3 gap-6 max-w-xl" delay={0.06}>
-            {[
-              ['12+', 'Anos de mercado'],
-              ['200+', 'Marcas posicionadas'],
-              ['38', 'Setores atendidos'],
-            ].map(([n, l]) => (
+            {stats.map(({ number: n, label: l }) => (
               <StaggerItem key={l}>
                 <div className="border-t border-hairline pt-4">
                   <div className="text-3xl font-medium tracking-tightest text-ink">{n}</div>
@@ -397,11 +349,8 @@ function FounderSection() {
           <Reveal delay={0.4}>
             <blockquote className="mt-12 border-l-2 border-ink pl-5 max-w-xl">
               <Quote className="w-5 h-5 text-ink mb-3" />
-              <p className="text-lg italic text-ink leading-relaxed font-light">
-                Posicionamento não é o que você diz sobre a sua marca.
-                É o que o mercado decide quando você não está na sala.
-              </p>
-              <footer className="mt-3 label-mono">— LUANA LIMA</footer>
+              <p className="text-lg italic text-ink leading-relaxed font-light">{content.founder_quote}</p>
+              <footer className="mt-3 label-mono">{content.founder_quote_author}</footer>
             </blockquote>
           </Reveal>
         </div>
@@ -410,14 +359,7 @@ function FounderSection() {
   );
 }
 
-/* ---------------------------- METRICS ---------------------------- */
-
-function Metrics() {
-  const data = [
-    ['+ 312%', 'Crescimento médio em demanda inbound qualificada'],
-    ['9.4×', 'Multiplicador de ticket médio pós reposicionamento'],
-    ['68%', 'Redução de dependência de mídia paga'],
-  ];
+function MetricsSection({ content, metrics }: { content: SiteContent; metrics: Metric[] }) {
   return (
     <section className="py-24 bg-ink text-white relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.04]" style={{
@@ -425,23 +367,23 @@ function Metrics() {
       }} />
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative">
         <Reveal>
-          <div className="label-mono text-silver-400">RESULTADOS · MÉDIA DE 12 MESES</div>
+          <div className="label-mono text-silver-400">{content.metrics_label}</div>
           <h2 className="mt-4 font-medium tracking-tightest leading-[1.02] text-[clamp(1.8rem,3.6vw,3rem)] max-w-3xl">
-            Números que medem a transição de fornecedor a referência.
+            {content.metrics_title}
           </h2>
         </Reveal>
 
         <StaggerGroup className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-px bg-silver-700" delay={0.1}>
-          {data.map(([n, l]) => (
-            <StaggerItem key={l} className="bg-ink p-8 lg:p-10">
-              <div className="text-5xl lg:text-6xl font-medium tracking-tightest chrome-text" style={{
+          {metrics.map((m) => (
+            <StaggerItem key={m.id} className="bg-ink p-8 lg:p-10">
+              <div className="text-5xl lg:text-6xl font-medium tracking-tightest" style={{
                 backgroundImage: 'linear-gradient(180deg, #ffffff 0%, #cccccc 50%, #888888 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}>
-                {n}
+                {m.number}
               </div>
-              <p className="mt-5 text-silver-300 leading-relaxed max-w-xs">{l}</p>
+              <p className="mt-5 text-silver-300 leading-relaxed max-w-xs">{m.description}</p>
             </StaggerItem>
           ))}
         </StaggerGroup>
@@ -450,69 +392,23 @@ function Metrics() {
   );
 }
 
-/* ---------------------------- PLANS ---------------------------- */
-
-function Plans({ onSelect }: { onSelect: (plan: string) => void }) {
-  const plans = [
-    {
-      name: 'Individual',
-      tagline: 'Para o profissional autoral.',
-      price: 'A partir de R$ 4.800',
-      period: '/ ciclo',
-      features: [
-        'Diagnóstico de marca pessoal',
-        'Posicionamento e arquitetura de narrativa',
-        '8 sessões 1:1 com Luana',
-        'Plano de presença digital de 90 dias',
-      ],
-      featured: false,
-    },
-    {
-      name: 'Grupo',
-      tagline: 'Imersão estratégica em pequena escala.',
-      price: 'R$ 12.500',
-      period: '/ ciclo',
-      features: [
-        'Mentoria em grupo seleto (até 12)',
-        'Frameworks proprietários completos',
-        'Workshops práticos quinzenais',
-        'Comunidade privada de fundadores',
-        'Auditoria individual de marca',
-      ],
-      featured: true,
-    },
-    {
-      name: 'Corporate',
-      tagline: 'Reestruturação para operações estabelecidas.',
-      price: 'Sob consulta',
-      period: '',
-      features: [
-        'Imersão executiva on-site',
-        'Reposicionamento corporativo completo',
-        'Squad dedicado por 6 a 12 meses',
-        'Governança de marca e brand book',
-        'Acompanhamento pós-implementação',
-      ],
-      featured: false,
-    },
-  ];
-
+function PlansSection({ onSelect, content, plans }: { onSelect: (plan: string) => void; content: SiteContent; plans: Plan[] }) {
   return (
     <section id="planos" className="py-24 lg:py-32 bg-bone border-y border-hairline">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal>
           <div className="text-center max-w-2xl mx-auto">
-            <div className="label-mono">PLANOS DE CONSULTORIA</div>
+            <div className="label-mono">{content.plans_label}</div>
             <h2 className="mt-4 font-medium tracking-tightest leading-[1.04] text-[clamp(2rem,4.4vw,3.6rem)]">
-              Três níveis de entrega.<br />
-              <span className="text-silver-500 italic font-light">Um único padrão.</span>
+              {content.plans_title}<br />
+              <span className="text-silver-500 italic font-light">{content.plans_subtitle}</span>
             </h2>
           </div>
         </Reveal>
 
         <StaggerGroup className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch" delay={0.08}>
           {plans.map((p) => (
-            <StaggerItem key={p.name}>
+            <StaggerItem key={p.id}>
               <motion.div
                 whileHover={{ y: -6 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
@@ -565,44 +461,25 @@ function Plans({ onSelect }: { onSelect: (plan: string) => void }) {
   );
 }
 
-/* ---------------------------- TESTIMONIALS ---------------------------- */
-
-function Testimonials() {
-  const items = [
-    {
-      quote: 'Saímos do leilão de preço. Em 9 meses, nossa marca passou a ser a referência citada espontaneamente em fóruns do setor.',
-      name: 'Marina Albuquerque',
-      role: 'Fundadora · Atelier Norhd',
-    },
-    {
-      quote: 'A Luana não vende marketing — ela vende clareza. Reescrevemos toda a narrativa da empresa em 6 sessões.',
-      name: 'Rafael Mendoza',
-      role: 'CEO · Vantage Group',
-    },
-    {
-      quote: 'O processo é cirúrgico. Pela primeira vez, nosso posicionamento é defensável.',
-      name: 'Helena Cardoso',
-      role: 'CMO · Meridian',
-    },
-  ];
+function TestimonialsSection({ content, testimonials }: { content: SiteContent; testimonials: Testimonial[] }) {
   return (
     <section className="py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal>
           <div className="grid lg:grid-cols-12 gap-8 items-end mb-14">
             <div className="lg:col-span-7">
-              <div className="label-mono">DEPOIMENTOS</div>
+              <div className="label-mono">{content.testimonials_label}</div>
               <h2 className="mt-4 font-medium tracking-tightest leading-[1.04] text-[clamp(2rem,4.4vw,3.6rem)]">
-                A diferença é mensurável.<br />
-                <span className="text-silver-500 italic font-light">A percepção, ainda mais.</span>
+                {content.testimonials_title}<br />
+                <span className="text-silver-500 italic font-light">{content.testimonials_subtitle}</span>
               </h2>
             </div>
           </div>
         </Reveal>
 
         <StaggerGroup className="grid md:grid-cols-3 gap-5">
-          {items.map((t) => (
-            <StaggerItem key={t.name}>
+          {testimonials.map((t) => (
+            <StaggerItem key={t.id}>
               <div className="glass-light rounded-2xl p-7 h-full flex flex-col">
                 <Quote className="w-5 h-5 text-ink" />
                 <p className="mt-5 text-[16px] leading-[1.65] text-ink flex-1">"{t.quote}"</p>
@@ -619,9 +496,7 @@ function Testimonials() {
   );
 }
 
-/* ---------------------------- FINAL CTA ---------------------------- */
-
-function FinalCTA({ onCta }: { onCta: () => void }) {
+function FinalCTA({ onCta, content }: { onCta: () => void; content: SiteContent }) {
   return (
     <section id="contato" className="py-24 lg:py-32 relative">
       <div className="max-w-5xl mx-auto px-6 lg:px-10">
@@ -630,18 +505,15 @@ function FinalCTA({ onCta }: { onCta: () => void }) {
             backgroundImage: 'radial-gradient(circle at 80% 0%, rgba(255,255,255,0.18), transparent 40%), radial-gradient(circle at 0% 100%, rgba(255,255,255,0.12), transparent 40%)'
           }} />
           <Reveal>
-            <div className="label-mono text-silver-400">PRÓXIMO PASSO</div>
+            <div className="label-mono text-silver-400">{content.cta_label}</div>
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="mt-4 font-medium tracking-tightest leading-[1.0] text-[clamp(2rem,5vw,4.4rem)] max-w-3xl">
-              Reserve uma conversa estratégica.
+              {content.cta_title}
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
-            <p className="mt-6 text-silver-300 max-w-xl leading-relaxed">
-              Avaliamos previamente cada solicitação. Apenas projetos com fit estratégico avançam para
-              consultoria. Resposta em até 24 horas úteis.
-            </p>
+            <p className="mt-6 text-silver-300 max-w-xl leading-relaxed">{content.cta_paragraph}</p>
           </Reveal>
           <Reveal delay={0.3}>
             <div className="mt-10 flex flex-wrap items-center gap-5">
@@ -649,11 +521,11 @@ function FinalCTA({ onCta }: { onCta: () => void }) {
                 onClick={onCta}
                 className="bg-white text-ink rounded-full px-7 py-4 text-[15px] font-medium tracking-tight inline-flex items-center gap-2.5 hover:bg-silver-200 transition"
               >
-                Solicitar Avaliação
+                {content.cta_button}
                 <ArrowRight className="w-4 h-4" />
               </MagneticButton>
-              <a href="mailto:contato@baratinhas.com" className="text-sm text-silver-300 hover:text-white transition border-b border-silver-600 pb-0.5">
-                contato@baratinhas.com
+              <a href={`mailto:${content.cta_email}`} className="text-sm text-silver-300 hover:text-white transition border-b border-silver-600 pb-0.5">
+                {content.cta_email}
               </a>
             </div>
           </Reveal>
@@ -663,9 +535,7 @@ function FinalCTA({ onCta }: { onCta: () => void }) {
   );
 }
 
-/* ---------------------------- FOOTER ---------------------------- */
-
-function Footer() {
+function FooterSection({ content }: { content: SiteContent }) {
   return (
     <footer className="border-t border-hairline py-12">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid md:grid-cols-3 gap-8 items-center">
@@ -674,21 +544,15 @@ function Footer() {
             <span className="text-white font-mono text-[10px] tracking-widest">B</span>
           </div>
           <span className="font-medium tracking-tightest text-ink">
-            Baratinhas<span className="text-silver-400 font-light">.</span> Marketing
+            {content.footer_brand}<span className="text-silver-400 font-light">.</span> {content.footer_suffix}
           </span>
         </div>
-        <div className="text-center label-mono">
-          © 2026 · POSICIONAMENTO ESTRATÉGICO
-        </div>
-        <div className="md:text-right text-sm text-silver-500">
-          São Paulo · Brasil
-        </div>
+        <div className="text-center label-mono">{content.footer_copyright}</div>
+        <div className="md:text-right text-sm text-silver-500">{content.footer_location}</div>
       </div>
     </footer>
   );
 }
-
-/* ---------------------------- MODAL ---------------------------- */
 
 function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   useEffect(() => {
