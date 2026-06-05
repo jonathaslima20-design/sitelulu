@@ -197,18 +197,6 @@ function Hero({ onCta }: { onCta: () => void }) {
               <div className="text-xs text-silver-500 mt-0.5">CEO · Estrategista de Marca</div>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.15, duration: 0.8 }}
-              className="absolute -top-5 -right-4 glass-light rounded-2xl px-4 py-3 flex items-center gap-3"
-            >
-              <div className="w-2 h-2 rounded-full bg-emerald-500" />
-              <div className="text-xs">
-                <div className="font-medium text-ink">Vagas Q1 2026</div>
-                <div className="text-silver-500">3 lugares restantes</div>
-              </div>
-            </motion.div>
           </motion.div>
         </div>
       </div>
