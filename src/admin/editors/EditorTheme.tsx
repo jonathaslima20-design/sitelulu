@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Save, Check } from 'lucide-react';
 
-export default function EditorTheme() {
+interface Props {
+  onColorsChange?: (colors: Record<string, string>) => void;
+}
+
+export default function EditorTheme({ onColorsChange }: Props) {
   const [colors, setColors] = useState<Record<string, string>>({
     ink: '#1a2b4a', bone: '#F8F9FA', hairline: '#E4E4E7',
   });
@@ -52,7 +56,11 @@ export default function EditorTheme() {
               <input
                 type="color"
                 value={value}
-                onChange={(e) => setColors(prev => ({ ...prev, [key]: e.target.value }))}
+                onChange={(e) => {
+                  const updated = { ...colors, [key]: e.target.value };
+                  setColors(updated);
+                  onColorsChange?.(updated);
+                }}
                 className="w-10 h-10 rounded-lg border border-hairline cursor-pointer"
               />
               <div className="flex-1">

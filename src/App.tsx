@@ -7,11 +7,8 @@ import MagneticButton from './components/MagneticButton';
 import Reveal, { StaggerGroup, StaggerItem } from './components/Reveal';
 import ParallaxImage from './components/ParallaxImage';
 import ConsultationForm from './components/ConsultationForm';
-import { useSiteContent, SiteContent, Plan, Testimonial, Brand, Metric, Pillar } from './hooks/useSiteContent';
+import { useSiteContent, SiteContent, Plan, Testimonial, Brand, Metric, Pillar, SectionVisibility, defaultVisibility } from './hooks/useSiteContent';
 
-const IMG_HERO = '/photo_2026-06-05_17-56-07.jpg';
-const IMG_BOOK = 'https://images.pexels.com/photos/5668473/pexels-photo-5668473.jpeg?auto=compress&cs=tinysrgb&w=800';
-const IMG_FOUNDER = 'https://images.pexels.com/photos/3756679/pexels-photo-3756679.jpeg?auto=compress&cs=tinysrgb&w=800';
 const IMG_PHONE = 'https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=800';
 
 const iconMap: Record<string, typeof Compass> = { Compass, Crosshair, Sparkles, Globe2 };
@@ -36,6 +33,13 @@ function App() {
   const showCursorGlow = theme?.effects?.cursorGlow !== false;
   const showGrain = theme?.effects?.grain !== false;
 
+  let visibility: SectionVisibility = defaultVisibility;
+  try { visibility = JSON.parse(content.sections_visibility || '{}'); } catch { /* use default */ }
+
+  const imgHero = content.img_hero || '/photo_2026-06-05_17-56-07.jpg';
+  const imgFounder = content.img_founder || 'https://images.pexels.com/photos/3756679/pexels-photo-3756679.jpeg?auto=compress&cs=tinysrgb&w=800';
+  const imgBook = content.img_book || 'https://images.pexels.com/photos/5668473/pexels-photo-5668473.jpeg?auto=compress&cs=tinysrgb&w=800';
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -48,18 +52,18 @@ function App() {
     <div className="relative min-h-screen bg-white text-ink overflow-x-hidden">
       {showCursorGlow && <CursorGlow />}
 
-      <Header scrolled={scrolled} onCta={() => openModal('Individual')} content={content} />
+      <Header scrolled={scrolled} onCta={() => openModal('Individual')} content={content} visibility={visibility} />
 
       <main className="relative z-10">
-        <Hero onCta={() => openModal('Individual')} content={content} showGrain={showGrain} />
-        <MarqueeSection content={content} />
-        <SocialProof content={content} brands={brands} />
-        <MethodologySection content={content} pillars={pillars} showGrain={showGrain} />
-        <FounderSection content={content} />
-        <MetricsSection content={content} metrics={metrics} />
-        <PlansSection onSelect={openModal} content={content} plans={plans} />
-        <TestimonialsSection content={content} testimonials={testimonials} />
-        <FinalCTA onCta={() => openModal('Corporate')} content={content} />
+        {visibility.hero && <Hero onCta={() => openModal('Individual')} content={content} showGrain={showGrain} imgHero={imgHero} />}
+        {visibility.marquee && <MarqueeSection content={content} />}
+        {visibility.social_proof && <SocialProof content={content} brands={brands} />}
+        {visibility.methodology && <MethodologySection content={content} pillars={pillars} showGrain={showGrain} />}
+        {visibility.founder && <FounderSection content={content} imgFounder={imgFounder} imgBook={imgBook} />}
+        {visibility.metrics && <MetricsSection content={content} metrics={metrics} />}
+        {visibility.plans && <PlansSection onSelect={openModal} content={content} plans={plans} />}
+        {visibility.testimonials && <TestimonialsSection content={content} testimonials={testimonials} />}
+        {visibility.cta && <FinalCTA onCta={() => openModal('Corporate')} content={content} />}
       </main>
 
       <FooterSection content={content} />
@@ -75,7 +79,7 @@ function App() {
   );
 }
 
-function Header({ scrolled, onCta, content }: { scrolled: boolean; onCta: () => void; content: SiteContent }) {
+function Header({ scrolled, onCta, content, visibility }: { scrolled: boolean; onCta: () => void; content: SiteContent; visibility: SectionVisibility }) {
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -96,10 +100,10 @@ function Header({ scrolled, onCta, content }: { scrolled: boolean; onCta: () => 
           </span>
         </a>
         <nav className="hidden md:flex items-center gap-9 text-sm text-silver-600">
-          <a href="#metodologia" className="hover:text-ink transition">Metodologia</a>
-          <a href="#fundadora" className="hover:text-ink transition">Fundadora</a>
-          <a href="#planos" className="hover:text-ink transition">Planos</a>
-          <a href="#contato" className="hover:text-ink transition">Contato</a>
+          {visibility.methodology && <a href="#metodologia" className="hover:text-ink transition">Metodologia</a>}
+          {visibility.founder && <a href="#fundadora" className="hover:text-ink transition">Fundadora</a>}
+          {visibility.plans && <a href="#planos" className="hover:text-ink transition">Planos</a>}
+          {visibility.cta && <a href="#contato" className="hover:text-ink transition">Contato</a>}
         </nav>
         <MagneticButton
           onClick={onCta}
@@ -113,7 +117,7 @@ function Header({ scrolled, onCta, content }: { scrolled: boolean; onCta: () => 
   );
 }
 
-function Hero({ onCta, content, showGrain }: { onCta: () => void; content: SiteContent; showGrain: boolean }) {
+function Hero({ onCta, content, showGrain, imgHero }: { onCta: () => void; content: SiteContent; showGrain: boolean; imgHero: string }) {
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 600], [0, 80]);
   const heroScale = useTransform(scrollY, [0, 600], [1, 1.06]);
@@ -172,7 +176,7 @@ function Hero({ onCta, content, showGrain }: { onCta: () => void; content: SiteC
           <Reveal delay={0.7}>
             <div className="mt-14 flex items-center gap-6 text-silver-500">
               <div className="flex -space-x-2">
-                {[IMG_FOUNDER, IMG_HERO, IMG_PHONE].map((s, i) => (
+                {[content.img_founder || '', imgHero, IMG_PHONE].map((s, i) => (
                   <div key={i} className="w-9 h-9 rounded-full border-2 border-white overflow-hidden bg-silver-200">
                     <img src={s} alt="" className="w-full h-full object-cover" />
                   </div>
@@ -192,7 +196,7 @@ function Hero({ onCta, content, showGrain }: { onCta: () => void; content: SiteC
         <div className="lg:col-span-5 relative">
           <motion.div style={{ y: heroY, scale: heroScale }} className="relative">
             <div className="photo-frame aspect-[4/5] relative">
-              <img src={IMG_HERO} alt="Luana Lima — CEO Baratinhas Marketing" className="w-full h-full object-cover" />
+              <img src={imgHero} alt="Luana Lima — CEO Baratinhas Marketing" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
             </div>
 
@@ -304,7 +308,7 @@ function MethodologySection({ content, pillars, showGrain }: { content: SiteCont
   );
 }
 
-function FounderSection({ content }: { content: SiteContent }) {
+function FounderSection({ content, imgFounder, imgBook }: { content: SiteContent; imgFounder: string; imgBook: string }) {
   let stats: { number: string; label: string }[] = [];
   try { stats = JSON.parse(content.founder_stats || '[]'); } catch { /* empty */ }
 
@@ -312,9 +316,9 @@ function FounderSection({ content }: { content: SiteContent }) {
     <section id="fundadora" className="py-24 lg:py-36 relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-12 gap-12">
         <div className="lg:col-span-5 relative">
-          <ParallaxImage src={IMG_FOUNDER} alt="Luana Lima" className="aspect-[4/5]" />
+          <ParallaxImage src={imgFounder} alt="Luana Lima" className="aspect-[4/5]" />
           <div className="hidden lg:block absolute -bottom-8 -right-8 w-48">
-            <ParallaxImage src={IMG_BOOK} alt="Estratégia de marca" className="aspect-[3/4]" range={30} />
+            <ParallaxImage src={imgBook} alt="Estratégia de marca" className="aspect-[3/4]" range={30} />
           </div>
         </div>
 

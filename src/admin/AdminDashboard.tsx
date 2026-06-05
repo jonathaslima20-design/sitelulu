@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useSiteContent, SiteContent, Plan, Testimonial, Brand, Metric, Pillar } from '../hooks/useSiteContent';
 import {
   LogOut, Save, LayoutDashboard, Type, Image, Palette, Users, Star,
-  BarChart3, CreditCard, MessageSquare, Megaphone, Menu, X, Check, AlertCircle
+  BarChart3, CreditCard, MessageSquare, Megaphone, Menu, X, Check, AlertCircle, Eye
 } from 'lucide-react';
 import AdminEditorHero from './editors/EditorHero';
 import AdminEditorMarquee from './editors/EditorMarquee';
@@ -17,12 +17,16 @@ import AdminEditorTestimonials from './editors/EditorTestimonials';
 import AdminEditorCTA from './editors/EditorCTA';
 import AdminEditorFooter from './editors/EditorFooter';
 import AdminEditorTheme from './editors/EditorTheme';
+import AdminEditorVisibility from './editors/EditorVisibility';
+import AdminEditorImages from './editors/EditorImages';
 import AdminLeads from './editors/AdminLeads';
 import LivePreview from './LivePreview';
 
-type Section = 'hero' | 'marquee' | 'clients' | 'methodology' | 'founder' | 'metrics' | 'plans' | 'testimonials' | 'cta' | 'footer' | 'theme' | 'leads';
+type Section = 'visibility' | 'images' | 'hero' | 'marquee' | 'clients' | 'methodology' | 'founder' | 'metrics' | 'plans' | 'testimonials' | 'cta' | 'footer' | 'theme' | 'leads';
 
 const sections: { id: Section; label: string; icon: typeof LayoutDashboard }[] = [
+  { id: 'visibility', label: 'Visibilidade', icon: Eye },
+  { id: 'images', label: 'Imagens', icon: Image },
   { id: 'hero', label: 'Hero', icon: Type },
   { id: 'marquee', label: 'Marquee', icon: Megaphone },
   { id: 'clients', label: 'Clientes', icon: Users },
@@ -52,6 +56,7 @@ export default function AdminDashboard() {
   const [draftBrands, setDraftBrands] = useState<Brand[]>([]);
   const [draftMetrics, setDraftMetrics] = useState<Metric[]>([]);
   const [draftPillars, setDraftPillars] = useState<Pillar[]>([]);
+  const [draftColors, setDraftColors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!siteData.loading) {
@@ -212,6 +217,8 @@ export default function AdminDashboard() {
 
   const renderEditor = () => {
     switch (activeSection) {
+      case 'visibility': return <AdminEditorVisibility content={draftContent} onChange={updateContent} />;
+      case 'images': return <AdminEditorImages content={draftContent} onChange={updateContent} />;
       case 'hero': return <AdminEditorHero content={draftContent} onChange={updateContent} />;
       case 'marquee': return <AdminEditorMarquee content={draftContent} onChange={updateContent} />;
       case 'clients': return <AdminEditorClients brands={draftBrands} content={draftContent} onChange={updateContent} onBrandsChange={updateBrands} />;
@@ -222,7 +229,7 @@ export default function AdminDashboard() {
       case 'testimonials': return <AdminEditorTestimonials testimonials={draftTestimonials} content={draftContent} onChange={updateContent} onTestimonialsChange={updateTestimonials} />;
       case 'cta': return <AdminEditorCTA content={draftContent} onChange={updateContent} />;
       case 'footer': return <AdminEditorFooter content={draftContent} onChange={updateContent} />;
-      case 'theme': return <AdminEditorTheme />;
+      case 'theme': return <AdminEditorTheme onColorsChange={setDraftColors} />;
       case 'leads': return <AdminLeads />;
     }
   };
@@ -321,6 +328,7 @@ export default function AdminDashboard() {
               brands={draftBrands}
               metrics={draftMetrics}
               pillars={draftPillars}
+              colors={draftColors}
             />
           </div>
         </div>

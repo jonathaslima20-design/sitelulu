@@ -54,6 +54,30 @@ export interface SiteTheme {
   effects: Record<string, boolean>;
 }
 
+export interface SectionVisibility {
+  hero: boolean;
+  marquee: boolean;
+  social_proof: boolean;
+  methodology: boolean;
+  founder: boolean;
+  metrics: boolean;
+  plans: boolean;
+  testimonials: boolean;
+  cta: boolean;
+}
+
+export const defaultVisibility: SectionVisibility = {
+  hero: true,
+  marquee: true,
+  social_proof: true,
+  methodology: true,
+  founder: true,
+  metrics: true,
+  plans: true,
+  testimonials: true,
+  cta: true,
+};
+
 export interface SiteData {
   content: SiteContent;
   plans: Plan[];
@@ -110,6 +134,10 @@ const defaultContent: SiteContent = {
   footer_suffix: 'Marketing',
   footer_copyright: '© 2026 · POSICIONAMENTO ESTRATÉGICO',
   footer_location: 'São Paulo · Brasil',
+  sections_visibility: JSON.stringify(defaultVisibility),
+  img_hero: '/photo_2026-06-05_17-56-07.jpg',
+  img_founder: 'https://images.pexels.com/photos/3756679/pexels-photo-3756679.jpeg?auto=compress&cs=tinysrgb&w=800',
+  img_book: 'https://images.pexels.com/photos/5668473/pexels-photo-5668473.jpeg?auto=compress&cs=tinysrgb&w=800',
 };
 
 const defaultPlans: Plan[] = [
