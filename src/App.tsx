@@ -114,7 +114,7 @@ function Hero({ onCta }: { onCta: () => void }) {
           <Reveal>
             <div className="inline-flex items-center gap-2 border border-hairline rounded-full px-3.5 py-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-ink animate-pulse" />
-              <span className="label-mono">CONSULTORIA · POSICIONAMENTO · 2026</span>
+              <span className="label-mono">BRANDING | COMUNICAÇÃO &amp; MARKETING</span>
             </div>
           </Reveal>
 
