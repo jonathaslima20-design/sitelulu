@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, ArrowUpRight, Compass, Check, Star, X, Quote, TrendingUp } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Compass, Check, Star, X, Quote } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
 import CursorGlow from './components/CursorGlow';
@@ -192,6 +192,7 @@ function App() {
 }
 
 function Header({ scrolled, onCta, content, visibility }: { scrolled: boolean; onCta: () => void; content: SiteContent; visibility: SectionVisibility }) {
+  const LogoIcon = getPillarIcon(content.header_logo_icon || 'TrendingUp');
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -204,7 +205,7 @@ function Header({ scrolled, onCta, content, visibility }: { scrolled: boolean; o
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-14 md:h-16 flex items-center justify-between gap-3">
         <a href="#top" className="flex items-center gap-2 shrink-0 min-w-0">
           <div className="w-7 h-7 rounded-md bg-ink flex items-center justify-center shrink-0">
-            <TrendingUp className="w-4 h-4 text-white" />
+            <LogoIcon className="w-4 h-4 text-white" />
           </div>
           <span className="font-medium tracking-tightest text-ink text-sm sm:text-base truncate max-w-[140px] sm:max-w-none">
             {content.header_brand_name}<span className="text-silver-400 font-light">.</span>
@@ -212,10 +213,10 @@ function Header({ scrolled, onCta, content, visibility }: { scrolled: boolean; o
           </span>
         </a>
         <nav className="hidden md:flex items-center gap-9 text-sm text-silver-600">
-          {visibility.methodology && <a href="#metodologia" className="hover:text-ink transition">Metodologia</a>}
-          {visibility.founder && <a href="#fundadora" className="hover:text-ink transition">Fundadora</a>}
-          {visibility.plans && <a href="#planos" className="hover:text-ink transition">Planos</a>}
-          {visibility.cta && <a href="#contato" className="hover:text-ink transition">Contato</a>}
+          {visibility.methodology && <a href="#metodologia" className="hover:text-ink transition">{content.header_nav_methodology || 'Metodologia'}</a>}
+          {visibility.founder && <a href="#fundadora" className="hover:text-ink transition">{content.header_nav_founder || 'Fundadora'}</a>}
+          {visibility.plans && <a href="#planos" className="hover:text-ink transition">{content.header_nav_plans || 'Planos'}</a>}
+          {visibility.cta && <a href="#contato" className="hover:text-ink transition">{content.header_nav_contact || 'Contato'}</a>}
         </nav>
         <MagneticButton
           onClick={onCta}

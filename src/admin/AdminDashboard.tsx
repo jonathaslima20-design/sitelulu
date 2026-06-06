@@ -24,6 +24,7 @@ import AdminLeads from './editors/AdminLeads';
 import EditorSEO from './editors/EditorSEO';
 import EditorIntegrations from './editors/EditorIntegrations';
 import EditorFonts from './editors/EditorFonts';
+import EditorHeader from './editors/EditorHeader';
 import AnalyticsDashboard from './editors/AnalyticsDashboard';
 import LivePreview from './LivePreview';
 
@@ -31,6 +32,7 @@ type Section =
   | 'analytics'
   | 'leads_list'
   | 'visibility'
+  | 'header'
   | 'images'
   | 'hero'
   | 'marquee'
@@ -62,6 +64,7 @@ const navGroups: NavGroup[] = [
     label: 'Conteúdo',
     items: [
       { id: 'visibility', label: 'Visibilidade', icon: Eye },
+      { id: 'header', label: 'Header', icon: LayoutDashboard },
       { id: 'images', label: 'Imagens', icon: Image },
       { id: 'hero', label: 'Hero', icon: Type },
       { id: 'marquee', label: 'Marquee', icon: Megaphone },
@@ -230,6 +233,7 @@ export default function AdminDashboard() {
       case 'analytics': return <AnalyticsDashboard />;
       case 'leads_list': return <AdminLeads />;
       case 'visibility': return <AdminEditorVisibility content={draftContent} onChange={updateContent} />;
+      case 'header': return <EditorHeader content={draftContent} onChange={updateContent} />;
       case 'images': return <AdminEditorImages content={draftContent} onChange={updateContent} />;
       case 'hero': return <AdminEditorHero content={draftContent} onChange={updateContent} />;
       case 'marquee': return <AdminEditorMarquee content={draftContent} onChange={updateContent} />;

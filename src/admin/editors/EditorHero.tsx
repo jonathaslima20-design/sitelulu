@@ -36,17 +36,6 @@ export default function EditorHero({ content, onChange }: Props) {
           <Field label="Cargo" value={content.hero_founder_role || ''} onChange={(v) => onChange('hero_founder_role', v)} />
         </div>
       </div>
-
-      <div className="border-t border-hairline pt-6">
-        <h3 className="text-sm font-medium text-ink mb-4">Header</h3>
-        <Field label="Nome da Marca" value={content.header_brand_name || ''} onChange={(v) => onChange('header_brand_name', v)} />
-        <div className="mt-4">
-          <Field label="Sufixo" value={content.header_brand_suffix || ''} onChange={(v) => onChange('header_brand_suffix', v)} />
-        </div>
-        <div className="mt-4">
-          <Field label="CTA Header" value={content.header_cta || ''} onChange={(v) => onChange('header_cta', v)} />
-        </div>
-      </div>
     </div>
   );
 }
