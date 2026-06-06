@@ -183,6 +183,18 @@ export function useSiteContent() {
     theme: null,
   });
   const [loading, setLoading] = useState(true);
+  const [previewOverride, setPreviewOverride] = useState<SiteData | null>(null);
+
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === 'PREVIEW_UPDATE') {
+        setPreviewOverride(e.data.payload as SiteData);
+        setLoading(false);
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, []);
 
   const fetchAll = useCallback(async () => {
     if (!supabase) {
@@ -223,5 +235,6 @@ export function useSiteContent() {
     fetchAll();
   }, [fetchAll]);
 
-  return { ...data, loading, refetch: fetchAll };
+  const active = previewOverride || data;
+  return { ...active, loading, refetch: fetchAll };
 }
