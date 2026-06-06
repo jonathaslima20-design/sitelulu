@@ -21,6 +21,7 @@ export interface Testimonial {
   quote: string;
   name: string;
   role: string;
+  avatar_url?: string;
   sort_order: number;
 }
 

@@ -201,14 +201,14 @@ function Header({ scrolled, onCta, content, visibility }: { scrolled: boolean; o
         scrolled ? 'bg-white/80 backdrop-blur-xl border-b border-hairline' : 'bg-transparent'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
-        <a href="#top" className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-md bg-ink flex items-center justify-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-14 md:h-16 flex items-center justify-between gap-3">
+        <a href="#top" className="flex items-center gap-2 shrink-0 min-w-0">
+          <div className="w-7 h-7 rounded-md bg-ink flex items-center justify-center shrink-0">
             <TrendingUp className="w-4 h-4 text-white" />
           </div>
-          <span className="font-medium tracking-tightest text-ink">
+          <span className="font-medium tracking-tightest text-ink text-sm sm:text-base truncate max-w-[140px] sm:max-w-none">
             {content.header_brand_name}<span className="text-silver-400 font-light">.</span>
-            <span className="label-mono ml-2 align-middle">{content.header_brand_suffix}</span>
+            <span className="label-mono ml-2 align-middle hidden sm:inline">{content.header_brand_suffix}</span>
           </span>
         </a>
         <nav className="hidden md:flex items-center gap-9 text-sm text-silver-600">
@@ -219,10 +219,11 @@ function Header({ scrolled, onCta, content, visibility }: { scrolled: boolean; o
         </nav>
         <MagneticButton
           onClick={onCta}
-          className="cta-black rounded-full px-5 py-2.5 text-sm font-medium tracking-tight inline-flex items-center gap-2"
+          className="cta-black rounded-full px-3 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium tracking-tight inline-flex items-center gap-1.5 shrink-0"
         >
-          {content.header_cta}
-          <ArrowRight className="w-3.5 h-3.5" />
+          <span className="hidden xs:inline sm:inline">{content.header_cta}</span>
+          <span className="xs:hidden sm:hidden">Agendar</span>
+          <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
         </MagneticButton>
       </div>
     </motion.header>
@@ -599,9 +600,18 @@ function TestimonialsSection({ content, testimonials }: { content: SiteContent; 
               <div className="glass-light rounded-2xl p-7 h-full flex flex-col">
                 <Quote className="w-5 h-5 text-ink" />
                 <p className="mt-5 text-[16px] leading-[1.65] text-ink flex-1">"{t.quote}"</p>
-                <div className="mt-6 pt-6 border-t border-hairline">
-                  <div className="font-medium text-ink">{t.name}</div>
-                  <div className="label-mono mt-1">{t.role}</div>
+                <div className="mt-6 pt-6 border-t border-hairline flex items-center gap-3">
+                  {t.avatar_url ? (
+                    <img src={t.avatar_url} alt={t.name} className="w-9 h-9 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-ink/10 flex items-center justify-center shrink-0 text-xs font-medium text-ink">
+                      {t.name.charAt(0)}
+                    </div>
+                  )}
+                  <div>
+                    <div className="font-medium text-ink">{t.name}</div>
+                    <div className="label-mono mt-0.5">{t.role}</div>
+                  </div>
                 </div>
               </div>
             </StaggerItem>

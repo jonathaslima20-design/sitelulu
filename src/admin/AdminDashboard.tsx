@@ -164,10 +164,10 @@ export default function AdminDashboard() {
 
       for (const t of draftTestimonials) {
         if (t.id.length < 10) {
-          const { error } = await supabase.from('testimonials').insert({ quote: t.quote, name: t.name, role: t.role, sort_order: t.sort_order });
+          const { error } = await supabase.from('testimonials').insert({ quote: t.quote, name: t.name, role: t.role, avatar_url: t.avatar_url || null, sort_order: t.sort_order });
           if (error) throw error;
         } else {
-          const { error } = await supabase.from('testimonials').update({ quote: t.quote, name: t.name, role: t.role, sort_order: t.sort_order }).eq('id', t.id);
+          const { error } = await supabase.from('testimonials').update({ quote: t.quote, name: t.name, role: t.role, avatar_url: t.avatar_url || null, sort_order: t.sort_order }).eq('id', t.id);
           if (error) throw error;
         }
       }
