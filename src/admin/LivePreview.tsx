@@ -46,7 +46,6 @@ export default function LivePreview({ content, plans, testimonials, brands, metr
 
   const handleIframeLoad = () => {
     setIframeLoaded(true);
-    setTimeout(sendUpdate, 100);
   };
 
   const reloadIframe = () => {

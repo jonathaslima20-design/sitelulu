@@ -20,6 +20,15 @@ function App() {
   const { content, plans, testimonials, brands, metrics, pillars, theme, loading } = useSiteContent();
 
   useEffect(() => {
+    if (theme?.colors) {
+      const root = document.documentElement;
+      Object.entries(theme.colors).forEach(([key, value]) => {
+        root.style.setProperty(`--color-${key}`, value as string);
+      });
+    }
+  }, [theme]);
+
+  useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
@@ -568,7 +577,8 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-sm"
+      style={{ backgroundColor: 'color-mix(in srgb, var(--color-ink) 40%, transparent)' }}
       onClick={onClose}
     >
       <motion.div

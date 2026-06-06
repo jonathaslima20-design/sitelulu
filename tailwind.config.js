@@ -8,10 +8,10 @@ export default {
         mono: ['"Geist Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
-        ink: '#1a2b4a',
-        jet: '#142238',
-        bone: '#F8F9FA',
-        hairline: '#E4E4E7',
+        ink: 'var(--color-ink, #1a2b4a)',
+        jet: 'var(--color-jet, #142238)',
+        bone: 'var(--color-bone, #F8F9FA)',
+        hairline: 'var(--color-hairline, #E4E4E7)',
         silver: {
           100: '#F4F4F5',
           200: '#E4E4E7',

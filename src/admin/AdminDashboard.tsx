@@ -66,6 +66,9 @@ export default function AdminDashboard() {
       setDraftBrands(siteData.brands);
       setDraftMetrics(siteData.metrics);
       setDraftPillars(siteData.pillars);
+      if (siteData.theme?.colors) {
+        setDraftColors(siteData.theme.colors as Record<string, string>);
+      }
     }
   }, [siteData.loading]);
 
