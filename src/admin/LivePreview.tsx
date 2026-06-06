@@ -23,6 +23,7 @@ export default function LivePreview({ content, plans, testimonials, brands, metr
 
   const imgHero = content.img_hero || '/photo_2026-06-05_17-56-07.jpg';
   const imgFounder = content.img_founder || 'https://images.pexels.com/photos/3756679/pexels-photo-3756679.jpeg?auto=compress&cs=tinysrgb&w=800';
+  const imgBook = content.img_book || 'https://images.pexels.com/photos/5668473/pexels-photo-5668473.jpeg?auto=compress&cs=tinysrgb&w=800';
 
   return (
     <div className="h-full overflow-y-auto">
@@ -128,9 +129,12 @@ export default function LivePreview({ content, plans, testimonials, brands, metr
           {visibility.founder && (
             <div className="py-12 px-10">
               <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-4">
+                <div className="col-span-4 relative">
                   <div className="rounded-2xl overflow-hidden aspect-[4/5]">
                     <img src={imgFounder} alt="" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="absolute -bottom-4 -right-2 w-[45%] rounded-xl overflow-hidden border-2 border-white shadow-md aspect-[3/4]">
+                    <img src={imgBook} alt="" className="w-full h-full object-cover" />
                   </div>
                 </div>
                 <div className="col-span-8">
