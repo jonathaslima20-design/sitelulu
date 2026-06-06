@@ -77,7 +77,28 @@ function App() {
     if (content.favicon_url) {
       let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null;
       if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
-      link.href = content.favicon_url;
+
+      if (content.favicon_url.startsWith('lucide:')) {
+        const iconName = content.favicon_url.replace('lucide:', '');
+        // Render Lucide icon as inline SVG favicon via data URI
+        const lucideAttrs = 'xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="%231a2b4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+        // Fetch SVG path from Lucide CDN and set as favicon
+        fetch(`https://unpkg.com/lucide-static@latest/icons/${iconName.replace(/([A-Z])/g, m => `-${m.toLowerCase()}`).replace(/^-/, '')}.svg`)
+          .then(r => r.text())
+          .then(svgText => {
+            const encoded = encodeURIComponent(svgText.replace(/\s+/g, ' ').replace(/currentColor/g, '%231a2b4a'));
+            link!.href = `data:image/svg+xml,${encoded}`;
+            link!.type = 'image/svg+xml';
+          })
+          .catch(() => {
+            // Fallback: simple square
+            const fallback = `<svg ${lucideAttrs}><rect x="3" y="3" width="18" height="18" rx="3"/></svg>`;
+            link!.href = `data:image/svg+xml,${encodeURIComponent(fallback)}`;
+          });
+      } else {
+        link.href = content.favicon_url;
+        link.type = '';
+      }
     }
   }, [content.seo_title, content.seo_description, content.og_image, content.og_title, content.og_description, content.og_site_name, content.canonical_url, content.favicon_url]);
 
