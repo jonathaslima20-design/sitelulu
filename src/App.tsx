@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, ArrowUpRight, Compass, Crosshair, Sparkles, Globe as Globe2, Check, Star, X, Quote, TrendingUp } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Compass, Check, Star, X, Quote, TrendingUp } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 
 import CursorGlow from './components/CursorGlow';
 import MagneticButton from './components/MagneticButton';
@@ -8,17 +9,22 @@ import Reveal, { StaggerGroup, StaggerItem } from './components/Reveal';
 import ParallaxImage from './components/ParallaxImage';
 import ConsultationForm from './components/ConsultationForm';
 import { useSiteContent, SiteContent, Plan, Testimonial, Brand, Metric, Pillar, SectionVisibility, defaultVisibility } from './hooks/useSiteContent';
+import { supabase } from './lib/supabase';
 
 const IMG_PHONE = 'https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=800';
 
-const iconMap: Record<string, typeof Compass> = { Compass, Crosshair, Sparkles, Globe2 };
+function getPillarIcon(name: string): typeof Compass {
+  return ((LucideIcons as Record<string, unknown>)[name] as typeof Compass) || Compass;
+}
 
 function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPlan, setModalPlan] = useState('Individual');
   const [scrolled, setScrolled] = useState(false);
+  const viewTracked = useRef(false);
   const { content, plans, testimonials, brands, metrics, pillars, theme, loading } = useSiteContent();
 
+  // Apply theme colors as CSS variables
   useEffect(() => {
     if (theme?.colors) {
       const root = document.documentElement;
@@ -27,6 +33,103 @@ function App() {
       });
     }
   }, [theme]);
+
+  // Apply fonts dynamically from Google Fonts
+  useEffect(() => {
+    const bodyFont = content.font_body;
+    const headingFont = content.font_heading;
+    const fonts = [...new Set([bodyFont, headingFont].filter(Boolean))];
+    if (!fonts.length) return;
+
+    const url = `https://fonts.googleapis.com/css2?${fonts.map(f => `family=${encodeURIComponent(f!).replace(/%20/g, '+')}:wght@300;400;500;600;700&`).join('')}display=swap`;
+    const existingLink = document.getElementById('gfonts-dynamic');
+    if (existingLink) existingLink.remove();
+    const link = document.createElement('link');
+    link.id = 'gfonts-dynamic';
+    link.rel = 'stylesheet';
+    link.href = url;
+    document.head.appendChild(link);
+
+    const root = document.documentElement;
+    if (headingFont) root.style.setProperty('--font-heading', `'${headingFont}', sans-serif`);
+    if (bodyFont) root.style.setProperty('--font-body', `'${bodyFont}', sans-serif`);
+  }, [content.font_body, content.font_heading]);
+
+  // Apply SEO meta tags + favicon + OG tags
+  useEffect(() => {
+    if (content.seo_title) document.title = content.seo_title;
+    const setMeta = (name: string, value: string, prop?: string) => {
+      const sel = prop ? `meta[property="${name}"]` : `meta[name="${name}"]`;
+      let el = document.querySelector(sel) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement('meta');
+        prop ? el.setAttribute('property', name) : el.setAttribute('name', name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', value);
+    };
+    if (content.seo_description) setMeta('description', content.seo_description);
+    if (content.og_title || content.seo_title) setMeta('og:title', content.og_title || content.seo_title || '', 'og:title');
+    if (content.og_description || content.seo_description) setMeta('og:description', content.og_description || content.seo_description || '', 'og:description');
+    if (content.og_image) setMeta('og:image', content.og_image, 'og:image');
+    if (content.og_site_name) setMeta('og:site_name', content.og_site_name, 'og:site_name');
+    if (content.canonical_url) setMeta('og:url', content.canonical_url, 'og:url');
+    if (content.favicon_url) {
+      let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null;
+      if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
+      link.href = content.favicon_url;
+    }
+  }, [content.seo_title, content.seo_description, content.og_image, content.og_title, content.og_description, content.og_site_name, content.canonical_url, content.favicon_url]);
+
+  // Inject tracking scripts
+  useEffect(() => {
+    if (content.meta_pixel_id) {
+      const existing = document.getElementById('meta-pixel');
+      if (!existing) {
+        const s = document.createElement('script');
+        s.id = 'meta-pixel';
+        s.innerHTML = `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${content.meta_pixel_id}');fbq('track','PageView');`;
+        document.head.appendChild(s);
+      }
+    }
+    if (content.gtm_id) {
+      const existing = document.getElementById('gtm-script');
+      if (!existing) {
+        const s = document.createElement('script');
+        s.id = 'gtm-script';
+        s.innerHTML = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${content.gtm_id}');`;
+        document.head.appendChild(s);
+      }
+    }
+    if (content.ga4_id && !content.gtm_id) {
+      const existing = document.getElementById('ga4-script');
+      if (!existing) {
+        const s = document.createElement('script');
+        s.id = 'ga4-script';
+        s.async = true;
+        s.src = `https://www.googletagmanager.com/gtag/js?id=${content.ga4_id}`;
+        document.head.appendChild(s);
+        const s2 = document.createElement('script');
+        s2.innerHTML = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${content.ga4_id}');`;
+        document.head.appendChild(s2);
+      }
+    }
+  }, [content.meta_pixel_id, content.gtm_id, content.ga4_id]);
+
+  // Track page view in Supabase (once per session)
+  useEffect(() => {
+    if (!supabase || viewTracked.current || loading) return;
+    const isPreview = new URLSearchParams(window.location.search).has('preview');
+    if (isPreview) return;
+    viewTracked.current = true;
+    const sessionId = sessionStorage.getItem('_sid') || (() => {
+      const id = Math.random().toString(36).slice(2);
+      sessionStorage.setItem('_sid', id);
+      return id;
+    })();
+    const device = window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop';
+    supabase.from('page_views').insert({ session_id: sessionId, referrer: document.referrer || null, device }).then(() => {});
+  }, [loading]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -288,7 +391,7 @@ function MethodologySection({ content, pillars, showGrain }: { content: SiteCont
 
         <StaggerGroup className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:auto-rows-[260px]">
           {pillars.map(({ icon, title, description, tag, span }) => {
-            const Icon = iconMap[icon] || Compass;
+            const Icon = getPillarIcon(icon);
             return (
               <StaggerItem key={tag} className={span}>
                 <motion.div

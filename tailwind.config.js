@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Inter Tight"', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-body)', '"Inter Tight"', 'system-ui', 'sans-serif'],
         mono: ['"Geist Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {

@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { SiteContent, Pillar } from '../../hooks/useSiteContent';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Pencil } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+import IconPicker from '../IconPicker';
 
 interface Props {
   pillars: Pillar[];
@@ -8,9 +11,15 @@ interface Props {
   onPillarsChange: (pillars: Pillar[]) => void;
 }
 
-const iconOptions = ['Compass', 'Crosshair', 'Sparkles', 'Globe2', 'Target', 'Zap', 'Lightbulb', 'Rocket', 'Award', 'Shield'];
+function PillarIcon({ name }: { name: string }) {
+  const Icon = (LucideIcons as Record<string, unknown>)[name] as React.ComponentType<{ className?: string }>;
+  if (!Icon) return null;
+  return <Icon className="w-5 h-5" />;
+}
 
 export default function EditorMethodology({ pillars, content, onChange, onPillarsChange }: Props) {
+  const [pickerFor, setPickerFor] = useState<number | null>(null);
+
   const addPillar = () => {
     onPillarsChange([...pillars, {
       id: String(Date.now()),
@@ -35,6 +44,14 @@ export default function EditorMethodology({ pillars, content, onChange, onPillar
 
   return (
     <div className="space-y-6">
+      {pickerFor !== null && (
+        <IconPicker
+          value={pillars[pickerFor]?.icon || 'Compass'}
+          onChange={(icon) => updatePillar(pickerFor, 'icon', icon)}
+          onClose={() => setPickerFor(null)}
+        />
+      )}
+
       <div>
         <h2 className="text-lg font-medium tracking-tight text-ink mb-1">Metodologia</h2>
         <p className="text-sm text-silver-500">Pilares da metodologia exibidos em cards.</p>
@@ -68,9 +85,16 @@ export default function EditorMethodology({ pillars, content, onChange, onPillar
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-[10px] uppercase tracking-wider text-silver-500 mb-1 block">Ícone</label>
-                    <select value={pillar.icon} onChange={(e) => updatePillar(i, 'icon', e.target.value)} className="w-full bg-white border border-hairline rounded-lg px-3 py-2 text-ink text-sm focus:outline-none focus:border-ink">
-                      {iconOptions.map(ic => <option key={ic} value={ic}>{ic}</option>)}
-                    </select>
+                    <button
+                      onClick={() => setPickerFor(i)}
+                      className="w-full bg-white border border-hairline rounded-lg px-3 py-2 text-ink text-sm focus:outline-none hover:border-ink transition flex items-center gap-2"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-ink text-white flex items-center justify-center shrink-0">
+                        <PillarIcon name={pillar.icon} />
+                      </div>
+                      <span className="flex-1 text-left truncate">{pillar.icon}</span>
+                      <Pencil className="w-3.5 h-3.5 text-silver-400 shrink-0" />
+                    </button>
                   </div>
                   <div>
                     <label className="text-[10px] uppercase tracking-wider text-silver-500 mb-1 block">Tag</label>
