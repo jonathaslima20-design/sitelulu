@@ -113,6 +113,8 @@ export default function AdminDashboard() {
   const [draftPillars, setDraftPillars] = useState<Pillar[]>([]);
   const [draftColors, setDraftColors] = useState<Record<string, string>>({});
 
+  useEffect(() => { document.title = 'Luana Azevedo - Painel de Controle'; }, []);
+
   useEffect(() => {
     if (!siteData.loading) {
       setDraftContent(siteData.content);
