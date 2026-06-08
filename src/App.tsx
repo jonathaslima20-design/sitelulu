@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, ArrowUpRight, Compass, Check, Star, X, Quote } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Compass, Check, Star, X, Quote, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
 import CursorGlow from './components/CursorGlow';
@@ -684,6 +684,12 @@ function FinalCTA({ onCta, content }: { onCta: () => void; content: SiteContent 
 }
 
 function FooterSection({ content }: { content: SiteContent }) {
+  const socials = [
+    { key: 'footer_instagram', icon: Instagram, href: content.footer_instagram, label: 'Instagram' },
+    { key: 'footer_whatsapp', icon: MessageCircle, href: content.footer_whatsapp ? `https://wa.me/${content.footer_whatsapp.replace(/\D/g, '')}` : '', label: 'WhatsApp' },
+    { key: 'footer_linkedin', icon: Linkedin, href: content.footer_linkedin, label: 'LinkedIn' },
+  ].filter(s => s.href);
+
   return (
     <footer className="border-t border-hairline py-12">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid md:grid-cols-3 gap-8 items-center">
@@ -696,7 +702,25 @@ function FooterSection({ content }: { content: SiteContent }) {
           </span>
         </div>
         <div className="text-center label-mono">{content.footer_copyright}</div>
-        <div className="md:text-right text-sm text-silver-500">{content.footer_location}</div>
+        <div className="md:text-right flex flex-col items-start md:items-end gap-3">
+          <span className="text-sm text-silver-500">{content.footer_location}</span>
+          {socials.length > 0 && (
+            <div className="flex items-center gap-4">
+              {socials.map(({ key, icon: Icon, href, label }) => (
+                <a
+                  key={key}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="text-silver-500 hover:text-ink transition-colors duration-300"
+                >
+                  <Icon className="w-4 h-4" />
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </footer>
   );
