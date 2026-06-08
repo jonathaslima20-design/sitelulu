@@ -203,7 +203,7 @@ function App() {
 
       <AnimatePresence>
         {modalOpen && (
-          <Modal onClose={() => setModalOpen(false)}>
+          <Modal onClose={() => setModalOpen(false)} brandName={content.header_brand_name || 'Consultoria'}>
             <ConsultationForm defaultPlan={modalPlan} onClose={() => setModalOpen(false)} />
           </Modal>
         )}
@@ -702,7 +702,7 @@ function FooterSection({ content }: { content: SiteContent }) {
   );
 }
 
-function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+function Modal({ children, onClose, brandName }: { children: React.ReactNode; onClose: () => void; brandName: string }) {
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
@@ -727,7 +727,7 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
         <button onClick={onClose} className="absolute top-5 right-5 w-9 h-9 rounded-full hover:bg-bone flex items-center justify-center transition">
           <X className="w-4 h-4" />
         </button>
-        <div className="label-mono">CONSULTORIA · BARATINHAS</div>
+        <div className="label-mono">CONSULTORIA · {brandName.toUpperCase()}</div>
         <h3 className="mt-2 text-2xl tracking-tightest font-medium text-ink">Agendar avaliação estratégica</h3>
         <p className="mt-2 text-sm text-silver-500">Resposta em até 24h úteis.</p>
         <div className="mt-7">{children}</div>
