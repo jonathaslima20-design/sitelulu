@@ -216,6 +216,14 @@ export function useSiteContent() {
       supabase.from('site_theme').select('*').limit(1).maybeSingle(),
     ]);
 
+    if (contentRes.error) console.error('[useSiteContent] site_content:', contentRes.error);
+    if (plansRes.error) console.error('[useSiteContent] plans:', plansRes.error);
+    if (testimonialsRes.error) console.error('[useSiteContent] testimonials:', testimonialsRes.error);
+    if (brandsRes.error) console.error('[useSiteContent] brands:', brandsRes.error);
+    if (metricsRes.error) console.error('[useSiteContent] metrics:', metricsRes.error);
+    if (pillarsRes.error) console.error('[useSiteContent] methodology_pillars:', pillarsRes.error);
+    if (themeRes.error) console.error('[useSiteContent] site_theme:', themeRes.error);
+
     const content: SiteContent = { ...defaultContent };
     if (contentRes.data) {
       for (const row of contentRes.data) {
