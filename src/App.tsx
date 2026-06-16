@@ -684,6 +684,7 @@ function FinalCTA({ onCta, content }: { onCta: () => void; content: SiteContent 
 }
 
 function FooterSection({ content }: { content: SiteContent }) {
+  const FooterLogoIcon = getPillarIcon(content.footer_logo_icon || 'TrendingUp');
   const socials = [
     { key: 'footer_instagram', icon: Instagram, href: content.footer_instagram, label: 'Instagram' },
     { key: 'footer_whatsapp', icon: MessageCircle, href: content.footer_whatsapp ? `https://wa.me/${content.footer_whatsapp.replace(/\D/g, '')}` : '', label: 'WhatsApp' },
@@ -695,7 +696,7 @@ function FooterSection({ content }: { content: SiteContent }) {
       <div className="max-w-7xl mx-auto px-6 lg:px-10 grid md:grid-cols-3 gap-8 items-center">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-md bg-ink flex items-center justify-center">
-            <span className="text-white font-mono text-[10px] tracking-widest">B</span>
+            <FooterLogoIcon className="w-4 h-4 text-white" />
           </div>
           <span className="font-medium tracking-tightest text-ink">
             {content.footer_brand}<span className="text-silver-400 font-light">.</span> {content.footer_suffix}

@@ -1,16 +1,65 @@
+import { useState } from 'react';
 import { SiteContent } from '../../hooks/useSiteContent';
+import { Pencil } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+import IconPicker from '../IconPicker';
 
 interface Props {
   content: SiteContent;
   onChange: (key: string, value: string) => void;
 }
 
+function LogoIconPreview({ name }: { name: string }) {
+  const Icon = (LucideIcons as Record<string, unknown>)[name] as React.ComponentType<{ className?: string }>;
+  if (!Icon) return null;
+  return <Icon className="w-4 h-4 text-white" />;
+}
+
 export default function EditorFooter({ content, onChange }: Props) {
+  const [iconPickerOpen, setIconPickerOpen] = useState(false);
+  const logoIcon = content.footer_logo_icon || 'TrendingUp';
+
   return (
     <div className="space-y-6">
+      {iconPickerOpen && (
+        <IconPicker
+          value={logoIcon}
+          onChange={icon => onChange('footer_logo_icon', icon)}
+          onClose={() => setIconPickerOpen(false)}
+        />
+      )}
+
       <div>
         <h2 className="text-lg font-medium tracking-tight text-ink mb-1">Footer</h2>
         <p className="text-sm text-silver-500">Rodapé da página.</p>
+      </div>
+
+      <div className="border-b border-hairline pb-6">
+        <h3 className="text-sm font-medium text-ink mb-4">Ícone da Logo</h3>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-ink flex items-center justify-center shrink-0">
+            <LogoIconPreview name={logoIcon} />
+          </div>
+          <button
+            onClick={() => setIconPickerOpen(true)}
+            className="flex items-center gap-2 text-sm text-ink border border-hairline rounded-lg px-4 py-2 hover:bg-bone transition"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+            Trocar ícone ({logoIcon})
+          </button>
+        </div>
+        <div className="mt-4 bg-bone rounded-xl border border-hairline px-4 py-3">
+          <p className="text-[10px] uppercase tracking-wider text-silver-400 mb-2">Preview</p>
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-md bg-ink flex items-center justify-center shrink-0">
+              <LogoIconPreview name={logoIcon} />
+            </div>
+            <span className="font-medium tracking-tightest text-ink text-sm">
+              {content.footer_brand || 'Marca'}
+              <span className="text-silver-400 font-light">.</span> {content.footer_suffix || 'Sufixo'}
+            </span>
+          </div>
+        </div>
       </div>
 
       <Field label="Nome da Marca" value={content.footer_brand || ''} onChange={(v) => onChange('footer_brand', v)} />

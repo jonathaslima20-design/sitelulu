@@ -131,6 +131,7 @@ const defaultContent: SiteContent = {
   cta_paragraph: 'Avaliamos previamente cada solicitação. Apenas projetos com fit estratégico avançam para consultoria. Resposta em até 24 horas úteis.',
   cta_button: 'Solicitar Avaliação',
   cta_email: 'contato@baratinhas.com',
+  footer_logo_icon: '',
   footer_brand: 'Baratinhas',
   footer_suffix: 'Marketing',
   footer_copyright: '© 2026 · POSICIONAMENTO ESTRATÉGICO',
