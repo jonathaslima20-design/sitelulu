@@ -331,7 +331,7 @@ function Hero({ onCta, content, showGrain, imgHero }: { onCta: () => void; conte
         <div className="lg:col-span-5 relative">
           <motion.div style={{ y: heroY, scale: heroScale }} className="relative">
             <div className="photo-frame aspect-[4/5] relative">
-              <img src={imgHero} alt="Luana Lima — CEO Baratinhas Marketing" className="w-full h-full object-cover" />
+              <img src={imgHero} alt="Luana Lima — CEO Luana Azevedo Marketing" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
             </div>
 
