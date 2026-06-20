@@ -234,11 +234,11 @@ export function useSiteContent() {
 
     setData({
       content,
-      plans: plansRes.data?.length ? plansRes.data : defaultPlans,
-      testimonials: testimonialsRes.data?.length ? testimonialsRes.data : defaultTestimonials,
-      brands: brandsRes.data?.length ? brandsRes.data : defaultBrands,
-      metrics: metricsRes.data?.length ? metricsRes.data : defaultMetrics,
-      pillars: pillarsRes.data?.length ? pillarsRes.data : defaultPillars,
+      plans: plansRes.data ?? defaultPlans,
+      testimonials: testimonialsRes.data ?? defaultTestimonials,
+      brands: brandsRes.data ?? defaultBrands,
+      metrics: metricsRes.data ?? defaultMetrics,
+      pillars: pillarsRes.data ?? defaultPillars,
       theme: themeRes.data || null,
     });
     setLoading(false);

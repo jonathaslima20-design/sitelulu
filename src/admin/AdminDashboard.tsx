@@ -104,6 +104,7 @@ export default function AdminDashboard() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
+  const pendingRefresh = useRef(false);
 
   const [draftContent, setDraftContent] = useState<SiteContent>({});
   const [draftPlans, setDraftPlans] = useState<Plan[]>([]);
@@ -123,6 +124,8 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!siteData.loading) {
+      if (!pendingRefresh.current && hasChanges) return;
+      pendingRefresh.current = false;
       setDraftContent(siteData.content);
       setDraftPlans(siteData.plans);
       setDraftTestimonials(siteData.testimonials);
@@ -132,13 +135,15 @@ export default function AdminDashboard() {
       if (siteData.theme?.colors) {
         setDraftColors(siteData.theme.colors as Record<string, string>);
       }
-      savedPlanIds.current = new Set(siteData.plans.filter(p => p.id.length >= 10).map(p => p.id));
-      savedTestimonialIds.current = new Set(siteData.testimonials.filter(t => t.id.length >= 10).map(t => t.id));
-      savedBrandIds.current = new Set(siteData.brands.filter(b => b.id.length >= 10).map(b => b.id));
-      savedMetricIds.current = new Set(siteData.metrics.filter(m => m.id.length >= 10).map(m => m.id));
-      savedPillarIds.current = new Set(siteData.pillars.filter(p => p.id.length >= 10).map(p => p.id));
+      const isDbId = (id: string) => id.length === 36 && id.includes('-');
+      savedPlanIds.current = new Set(siteData.plans.filter(p => isDbId(p.id)).map(p => p.id));
+      savedTestimonialIds.current = new Set(siteData.testimonials.filter(t => isDbId(t.id)).map(t => t.id));
+      savedBrandIds.current = new Set(siteData.brands.filter(b => isDbId(b.id)).map(b => b.id));
+      savedMetricIds.current = new Set(siteData.metrics.filter(m => isDbId(m.id)).map(m => m.id));
+      savedPillarIds.current = new Set(siteData.pillars.filter(p => isDbId(p.id)).map(p => p.id));
     }
-  }, [siteData.loading]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [siteData.plans, siteData.testimonials, siteData.brands, siteData.metrics, siteData.pillars, siteData.loading]);
 
   const updateContent = useCallback((key: string, value: string) => {
     setDraftContent(prev => ({ ...prev, [key]: value }));
@@ -168,8 +173,10 @@ export default function AdminDashboard() {
       const { error: contentError } = await supabase.from('site_content').upsert(contentRows, { onConflict: 'key' });
       if (contentError) throw contentError;
 
+      const isDbId = (id: string) => id.length === 36 && id.includes('-');
+
       for (const plan of draftPlans) {
-        if (plan.id.length < 10) {
+        if (!isDbId(plan.id)) {
           const { error } = await supabase.from('plans').insert({ name: plan.name, tagline: plan.tagline, price: plan.price, period: plan.period, features: plan.features, featured: plan.featured, sort_order: plan.sort_order });
           if (error) throw error;
         } else {
@@ -177,7 +184,7 @@ export default function AdminDashboard() {
           if (error) throw error;
         }
       }
-      const currentPlanIds = new Set(draftPlans.filter(p => p.id.length >= 10).map(p => p.id));
+      const currentPlanIds = new Set(draftPlans.filter(p => isDbId(p.id)).map(p => p.id));
       const deletedPlanIds = [...savedPlanIds.current].filter(id => !currentPlanIds.has(id));
       if (deletedPlanIds.length > 0) {
         const { error } = await supabase.from('plans').delete().in('id', deletedPlanIds);
@@ -185,7 +192,7 @@ export default function AdminDashboard() {
       }
 
       for (const t of draftTestimonials) {
-        if (t.id.length < 10) {
+        if (!isDbId(t.id)) {
           const { error } = await supabase.from('testimonials').insert({ quote: t.quote, name: t.name, role: t.role, avatar_url: t.avatar_url || null, sort_order: t.sort_order });
           if (error) throw error;
         } else {
@@ -193,7 +200,7 @@ export default function AdminDashboard() {
           if (error) throw error;
         }
       }
-      const currentTestimonialIds = new Set(draftTestimonials.filter(t => t.id.length >= 10).map(t => t.id));
+      const currentTestimonialIds = new Set(draftTestimonials.filter(t => isDbId(t.id)).map(t => t.id));
       const deletedTestimonialIds = [...savedTestimonialIds.current].filter(id => !currentTestimonialIds.has(id));
       if (deletedTestimonialIds.length > 0) {
         const { error } = await supabase.from('testimonials').delete().in('id', deletedTestimonialIds);
@@ -201,7 +208,7 @@ export default function AdminDashboard() {
       }
 
       for (const b of draftBrands) {
-        if (b.id.length < 10) {
+        if (!isDbId(b.id)) {
           const { error } = await supabase.from('brands').insert({ name: b.name, sort_order: b.sort_order });
           if (error) throw error;
         } else {
@@ -209,7 +216,7 @@ export default function AdminDashboard() {
           if (error) throw error;
         }
       }
-      const currentBrandIds = new Set(draftBrands.filter(b => b.id.length >= 10).map(b => b.id));
+      const currentBrandIds = new Set(draftBrands.filter(b => isDbId(b.id)).map(b => b.id));
       const deletedBrandIds = [...savedBrandIds.current].filter(id => !currentBrandIds.has(id));
       if (deletedBrandIds.length > 0) {
         const { error } = await supabase.from('brands').delete().in('id', deletedBrandIds);
@@ -217,7 +224,7 @@ export default function AdminDashboard() {
       }
 
       for (const m of draftMetrics) {
-        if (m.id.length < 10) {
+        if (!isDbId(m.id)) {
           const { error } = await supabase.from('metrics').insert({ number: m.number, description: m.description, sort_order: m.sort_order });
           if (error) throw error;
         } else {
@@ -225,7 +232,7 @@ export default function AdminDashboard() {
           if (error) throw error;
         }
       }
-      const currentMetricIds = new Set(draftMetrics.filter(m => m.id.length >= 10).map(m => m.id));
+      const currentMetricIds = new Set(draftMetrics.filter(m => isDbId(m.id)).map(m => m.id));
       const deletedMetricIds = [...savedMetricIds.current].filter(id => !currentMetricIds.has(id));
       if (deletedMetricIds.length > 0) {
         const { error } = await supabase.from('metrics').delete().in('id', deletedMetricIds);
@@ -233,7 +240,7 @@ export default function AdminDashboard() {
       }
 
       for (const p of draftPillars) {
-        if (p.id.length < 10) {
+        if (!isDbId(p.id)) {
           const { error } = await supabase.from('methodology_pillars').insert({ icon: p.icon, title: p.title, description: p.description, tag: p.tag, span: p.span, sort_order: p.sort_order });
           if (error) throw error;
         } else {
@@ -241,7 +248,7 @@ export default function AdminDashboard() {
           if (error) throw error;
         }
       }
-      const currentPillarIds = new Set(draftPillars.filter(p => p.id.length >= 10).map(p => p.id));
+      const currentPillarIds = new Set(draftPillars.filter(p => isDbId(p.id)).map(p => p.id));
       const deletedPillarIds = [...savedPillarIds.current].filter(id => !currentPillarIds.has(id));
       if (deletedPillarIds.length > 0) {
         const { error } = await supabase.from('methodology_pillars').delete().in('id', deletedPillarIds);
@@ -256,6 +263,7 @@ export default function AdminDashboard() {
 
       setHasChanges(false);
       showToast('success', 'Alterações publicadas com sucesso!');
+      pendingRefresh.current = true;
       siteData.refetch();
     } catch {
       showToast('error', 'Erro ao salvar. Tente novamente.');
